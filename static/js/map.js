@@ -1,6 +1,6 @@
 var locations = [
   {
-    title: 'Aeroporto Bacacheri',
+    title: 'Aeroporto do Bacacheri',
     location: {lat: -25.4021675, lng: -49.2334194 },
     id: '4d0f5d1ad7d6a09006a467f7'
   },
@@ -10,49 +10,17 @@ var locations = [
     id: '4d0f5d1ad7d6a09006a467f7'
   },
   {
-    title: 'Museu Egípcio',
+    title: 'Museu Egípcio e Rosa Cruz',
     location: {lat: -25.390481, lng: -49.225742},
     id: '4d0f5d1ad7d6a09006a467f7'
   },
   {
-    title: '20 BIB',
-    location: {lat: -25.402262, lng: -49.240776},
-    id: '4d0f5d1ad7d6a09006a467f7'
-  },
-  {
-    title: 'Graciosa Country Club',
-    location: {lat: -25.407359, lng: -49.248015},
-    id: '4d0f5d1ad7d6a09006a467f7'
-  },
-  {
-    title: 'Shopping Via Colleghi',
-    location: {lat: -25.404379, lng: -49.245154},
-    id: '4d0f5d1ad7d6a09006a467f7'
-  },
-  {
-    title: 'Cindacta 2',
+    title: 'Cindacta II',
     location: {lat: -25.400118, lng: -49.237518},
-    id: '4d0f5d1ad7d6a09006a467f7'
-  },
-  {
-    title: '27 Batalhão Logístico',
-    location: {lat: -25.395961, lng: -49.226121},
-    id: '4d0f5d1ad7d6a09006a467f7'
-  },
-  {
-    title: 'Clube Duque de Caxias',
-    location: {lat: -25.396376, lng: -49.236853},
-    id: '4d0f5d1ad7d6a09006a467f7'
-  },
-  {
-    title: 'Obelisco E. Gaertner',
-    location: {lat: -25.405062, lng: -49.245561},
     id: '4d0f5d1ad7d6a09006a467f7'
   }
 ];
 
-
-// https://api.foursquare.com/v2/venues/?&client_id=HP0EAILBVHBST1TDVEC5I34RX2BFMBAAZK1WDCVCOYC5CF0O&client_secret=S05VEWMPQHUINJLKORFGVWDWEDGFUGMK2FDXU2OOYK4W44VB&v=20180323
 
 var foursquareUrl = 'https://api.foursquare.com/v2/venues/';
 var foursquareClientID = '/?&client_id=HP0EAILBVHBST1TDVEC5I34RX2BFMBAAZK1WDCVCOYC5CF0O';
@@ -99,8 +67,8 @@ function initMap() {
     this.location = data.location;
     this.marker = "";
     this.id = data.id;
-    this.shortUrl = "";
-    this.photoUrl = "";
+    this.Url = "";
+    this.textWiki = "";
   };
 
   // Creates a bounce effect on marker when clicked on
@@ -119,18 +87,25 @@ function initMap() {
 
     /*Sets the content of the infowindow*/
     function getContent(view) {
-        var contentString = "<h4>" + view.name +
-            "</h4><br><div style='width:120px;min-height:120px'><img src=" + '"' +
-            view.photoUrl + '"></div><div><a href="' + view.shortUrl +
-            '" target="_blank">Saiba mais no Foursquare</a>';
-        let errorString = "Conteúdo não disponível no Foursquare.";
+      var contentString = "<h4>" + view.name + "</h4>" +
+        "<br>" +
+        "<div style='width:150px;min-height:150px'>" +
+            "<p>" +
+              view.textWiki +
+            "</p>"+
+        "</div>"+
+        "<div>" +
+            "<a href="+
+              view.Url +
+            " target=_blank>Acessar a Wikipedia</a>"+
+        "</div>";
+        let errorString = "Conteúdo não disponível na Wikipedia.";
         if (view.name.length > 0) {
             return contentString;
         } else {
             return errorString;
         }
     }
-
 
   var ViewModel = function(){
     var self = this;
@@ -162,25 +137,21 @@ function initMap() {
 
 
         //AJAX request to get images
-this.getFoursquareimage = ko.computed(function () {
-    self.viewList().forEach(function (view) {
-        var VenueId = view.id;
-        var FourSqUrl = foursquareUrl + VenueId + foursquareClientID + foursquareClientSecret + foursquareVersion;
-        $.ajax({
-            type: "GET",
-            url: FourSqUrl,
-            dataType: "json"
-        })
-            .done(function (data) {
-                let response = data.response ? data.response : "";
-                let venue = response.venue ? data.venue : "";
-                view.name = response.venue.name;
-                view.shortUrl = response.venue.shortUrl;
-                view.photoUrl = response.venue.bestPhoto.prefix + "150x150" +
-                    response.venue.bestPhoto.suffix;
+        this.getWikipediaInfos = ko.computed(function () {
+            self.viewList().forEach(function (view) {
+                var  wikiURL = 'http://pt.wikipedia.org/w/api.php?action=opensearch&search=' + view.name() + '&format=json&callback=wikiCallback';
+                $.ajax(wikiURL, {
+                  dataType: "jsonp",
+                  data: {
+                    async: true
+                  }
+                }).done(function (response) {
+                    view.name = response[1][0];
+                    view.textWiki = response[2][0];
+                    view.Url = response[3][0];
+                });
             });
-    });
-});
+        });
 
         self.query = ko.observable('');
 
@@ -192,7 +163,7 @@ this.getFoursquareimage = ko.computed(function () {
             });
           }else{
             return ko.utils.arrayFilter(this.viewList(), function(item){
-              if (item.name().toLowerCase().indexOf(self.query()) >= 0){
+              if (item.name.toLowerCase().indexOf(self.query()) >= 0){
                 item.marker.setVisible(true);
                 return true;
               }else {
