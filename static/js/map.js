@@ -1,31 +1,31 @@
+// Array com os locais apresentados no mapa
 var locations = [
   {
     title: 'Aeroporto do Bacacheri',
-    location: {lat: -25.4021675, lng: -49.2334194 },
-    id: '4d0f5d1ad7d6a09006a467f7'
-  },
+    location: {lat: -25.4021675, lng: -49.2334194 }
+    },
+  {
+    title: 'Universidade Federal do Paraná',
+    location: {lat: -25.411706, lng: -49.250299 }
+    },
+  {
+    title: 'Estádio Major Antônio Couto Pereira',
+    location: {lat: -25.421124, lng: -49.259533 }
+    },
   {
     title: 'Parque Bacacheri',
-    location: {lat: -25.390131, lng: -49.230268},
-    id: '4d0f5d1ad7d6a09006a467f7'
-  },
+    location: {lat: -25.390131, lng: -49.230268 }
+    },
   {
     title: 'Museu Egípcio e Rosa Cruz',
-    location: {lat: -25.390481, lng: -49.225742},
-    id: '4d0f5d1ad7d6a09006a467f7'
-  },
+    location: {lat: -25.390481, lng: -49.225742 }
+    },
   {
     title: 'Cindacta II',
     location: {lat: -25.400118, lng: -49.237518},
-    id: '4d0f5d1ad7d6a09006a467f7'
   }
 ];
 
-
-var foursquareUrl = 'https://api.foursquare.com/v2/venues/';
-var foursquareClientID = '/?&client_id=HP0EAILBVHBST1TDVEC5I34RX2BFMBAAZK1WDCVCOYC5CF0O';
-var foursquareClientSecret = '&client_secret=S05VEWMPQHUINJLKORFGVWDWEDGFUGMK2FDXU2OOYK4W44VB';
-var foursquareVersion = '&v=20180323';
 
 var map;
 var bounds;
@@ -33,13 +33,14 @@ var infowindow;
 
 
 function initMap() {
-
-  // Constructor creates a new map - only center and zoom are required.
+  // Cria um novo mapa - somente center e zoom são requeridos.
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: -25.400118 , lng: -49.237518},
-    zoom: 15
+    zoom: 14
   });
+  console.log(map)
 
+  // Cria uma infowindow para apresentar informações no marker,
   infowindow = new google.maps.InfoWindow({
         maxWidth: 150,
         content: ""
@@ -47,20 +48,22 @@ function initMap() {
 
   bounds = new google.maps.LatLngBounds();
 
+  // Ao fazer zoom se clicar no mapa ele retorna ao zoom de 14 e centralizado
+  // na lat e lng fornecida abaixo.
   map.addListener('click', function () {
       infowindow.close(infowindow);
       map.setCenter({
           lat: -25.400118,
           lng: -49.237518
       });
-      map.setZoom(15);
+      map.setZoom(14);
   });
 
   window.onresize = function () {
       map.fitBounds(bounds);
   };
 
-  // Constructor function to create object and push in observable array
+  // Função construtora para cria o objeto para dar um observable array.
   var View = function(data){
     var self = this;
     this.name = ko.observable(data.title);
@@ -71,12 +74,11 @@ function initMap() {
     this.textWiki = "";
   };
 
-  // Creates a bounce effect on marker when clicked on
+  // Cria um efeito de BOUNCE quando clicar sobre o marker.
   function toggleBounce(marker) {
         if (marker.getAnimation() !== null) {
             marker.setAnimation(null);
         } else {
-            // marker.setAnimation(google.maps.Animation.BOUNCE);
             marker.setAnimation(google.maps.Animation.BOUNCE);
             setTimeout(function () {
                 marker.setAnimation(null);
@@ -84,8 +86,7 @@ function initMap() {
         }
     }
 
-
-    /*Sets the content of the infowindow*/
+    // Insere o conteúdo no infowindow.
     function getContent(view) {
       var contentString = "<h4>" + view.name + "</h4>" +
         "<br>" +
@@ -97,9 +98,9 @@ function initMap() {
         "<div>" +
             "<a href="+
               view.Url +
-            " target=_blank>Acessar a Wikipedia</a>"+
+            " target=_blank>Acessar a Wikipédia</a>"+
         "</div>";
-        let errorString = "Conteúdo não disponível na Wikipedia.";
+        let errorString = "Conteúdo não disponível na Wikipédia.";
         if (view.name.length > 0) {
             return contentString;
         } else {
@@ -114,66 +115,72 @@ function initMap() {
             google.maps.event.trigger(view.marker, "click");
         };
 
-        this.viewList = ko.observableArray([]);
-        locations.forEach(function (item) {
-            self.viewList().push(new View(item));
+    this.viewList = ko.observableArray([]);
+    locations.forEach(function (item) {
+        self.viewList().push(new View(item));
+    });
+    //
+87/5000
+    // Adiciona o marker para cada local e adiciona conteúdo ao infowindow
+    // com o evento "click"
+    self.viewList().forEach(function (view) {
+        var marker = new google.maps.Marker({
+            map: map,
+            position: view.location,
+            animation: google.maps.Animation.DROP
         });
-        //Adding marker for each location and adding content to the infowindow with "click" event
+        view.marker = marker;
+        bounds.extend(marker.position);
+        marker.addListener("click", function (e) {
+            map.panTo(this.position);
+            infowindow.setContent(getContent(view));
+            infowindow.open(map, marker);
+            toggleBounce(marker);
+        });
+    });
+
+    // Requisição AJAX
+    this.getWikipediaInfos = ko.computed(function () {
         self.viewList().forEach(function (view) {
-            var marker = new google.maps.Marker({
-                map: map,
-                position: view.location,
-                animation: google.maps.Animation.DROP
-            });
-            view.marker = marker;
-            bounds.extend(marker.position);
-            marker.addListener("click", function (e) {
-                map.panTo(this.position);
-                infowindow.setContent(getContent(view));
-                infowindow.open(map, marker);
-                toggleBounce(marker);
-            });
-        });
-
-
-        //AJAX request to get images
-        this.getWikipediaInfos = ko.computed(function () {
-            self.viewList().forEach(function (view) {
-                var  wikiURL = 'http://pt.wikipedia.org/w/api.php?action=opensearch&search=' + view.name() + '&format=json&callback=wikiCallback';
-                $.ajax(wikiURL, {
-                  dataType: "jsonp",
-                  data: {
-                    async: true
-                  }
-                }).done(function (response) {
-                    view.name = response[1][0];
-                    view.textWiki = response[2][0];
-                    view.Url = response[3][0];
-                });
-            });
-        });
-
-        self.query = ko.observable('');
-
-        this.filteredViewList = ko.computed(function(){
-          if(!self.query()){
-            return ko.utils.arrayFilter(self.viewList(), function(item){
-              item.marker.setVisible(true);
-              return true;
-            });
-          }else{
-            return ko.utils.arrayFilter(this.viewList(), function(item){
-              if (item.name.toLowerCase().indexOf(self.query()) >= 0){
-                item.marker.setVisible(true);
-                return true;
-              }else {
-                item.marker.setVisible(false);
-                return false;
+            var  wikiURL = 'http://pt.wikipedia.org/w/api.php?action=opensearch&search=' + view.name() + '&format=json&callback=wikiCallback';
+            $.ajax(wikiURL, {
+              dataType: "jsonp",
+              data: {
+                async: true
               }
+            }).done(function (response) {
+                view.name = response[1][0];
+                view.textWiki = response[2][0];
+                view.Url = response[3][0];
             });
+        });
+    });
+
+    self.query = ko.observable('');
+
+    this.filteredViewList = ko.computed(function(){
+      if(!self.query()){
+        return ko.utils.arrayFilter(self.viewList(), function(item){
+          item.marker.setVisible(true);
+          return true;
+        });
+      }else{
+        return ko.utils.arrayFilter(this.viewList(), function(item){
+          if (item.name.toLowerCase().indexOf(self.query()) >= 0){
+            item.marker.setVisible(true);
+            return true;
+          }else {
+            item.marker.setVisible(false);
+            return false;
           }
-        }, this);
+        });
+      }
+    }, this);
 
   }
   ko.applyBindings(new ViewModel());
+}
+// Função para verificar o erro de carregamento do mapa
+function googleError() {
+    document.getElementById('mapError').style.display = 'block';
 }

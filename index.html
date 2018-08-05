@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
   <head>
 
@@ -17,41 +17,41 @@
     <!-- Custom fonts for this template-->
     <link href="static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
 
-    <!-- Page level plugin CSS-->
-    <link href="static/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
-
     <!-- Custom styles for this template-->
     <link href="static/css/sb-admin.css" rel="stylesheet">
 
     <!-- Google icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyByrKuv4lmkCv8bGcuNn8u2xrwWJeWCQpU&v=3&callback=initMap" onerror="googleError()"></script>
+
   </head>
 
   <body id="page-top">
-
+    <!-- Navbar com os componentes botão hambúrguer e input para pesquisa do local -->
     <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
-
-      <a class="navbar-brand mr-1" href="index.html">Mapa do Bairro</a>
-
-      <button class="btn btn-link btn-sm text-danger order-1 order-sm-0" id="sidebarToggle" href="#">
-        <i class="material-icons" style="font-size:35px;color:#F44336">menu</i>
-      </button>
-    </nav>
-
-
-    <div id="wrapper">
-      <ul class="sidebar navbar-nav">
-        <p></p>
+      <form class=" mr-0 mr-md-3 my-2 my-md-0">
         <div class="input-group mb-3">
           <div class="input-group-prepend">
             <span class="input-group-text" id="basic-addon1">
               <i class="material-icons" style="font-size:20px;color:#F44336">search</i>
             </span>
           </div>
+          <!-- Input para pesquisa do local -->
           <input type="text" class="form-control" data-bind="value: query, valueUpdate:'keyup'" id="search-keyword" placeholder="Filtre o endereço" aria-label="Filtro" aria-describedby="basic-addon1">
         </div>
+      </form>
+      <!-- Botão de hambúrguer -->
+      <button class="btn btn-link btn-sm text-danger order-1 order-sm-0" id="sidebarToggle" href="#">
+        <i class="material-icons" style="font-size:35px;color:#F44336">menu</i>
+      </button>
+      <!-- Texto da navbar -->
+      <a class="navbar-brand mr-1" href="index.html">Mapa do Bairro</a>
+    </nav>
 
+    <div id="wrapper">
+      <!-- Barra lateral -->
+      <ul class="sidebar navbar-nav">
         <li data-bind="foreach: filteredViewList" class="nav-item">
           <a class="nav-link" href="#">
             <i class="material-icons" style="font-size:16px;color:#F44336">place</i>
@@ -59,12 +59,18 @@
           </a>
         </li>
       </ul>
-
+      <!-- Mensagem de erro do carregamento do mapa -->
       <div id="content-wrapper">
-
+        <div class="alert alert-danger" role="alert" id="mapError" style="display: none;" >
+            <p>Ocorreu um erro..Por favor verifique os seguintes casos:</p>
+            <hr>
+            <ul>
+                <li>Verifique sua conexão com a internet.</li>
+                <li>Se o mapa não carregou por favor tente mais tarde.</li>
+            </ul>
+        </div>
         <div id="map"></div>
-
-        <!-- Sticky Footer -->
+        <!-- Footer -->
         <footer class="sticky-footer">
           <div class="container my-auto">
             <div class="copyright text-center my-auto">
@@ -72,17 +78,8 @@
             </div>
           </div>
         </footer>
-
       </div>
-      <!-- /.content-wrapper -->
     </div>
-    <!-- /#wrapper -->
-
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-      <i class="fas fa-angle-up"></i>
-    </a>
-
 
     <!-- Bootstrap core JavaScript-->
     <script src="static/vendor/jquery/jquery.min.js"></script>
@@ -93,13 +90,8 @@
 
     <!-- Custom scripts for all pages-->
     <script src="static/js/sb-admin.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
-    <!-- <script src="static/js/lib/knockout-3.2.0.js"></script> -->
     <script src="static/js/map.js"></script>
-    <script async defer
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyByrKuv4lmkCv8bGcuNn8u2xrwWJeWCQpU&v=3&callback=initMap">
-    </script>
 
   </body>
 </html>
