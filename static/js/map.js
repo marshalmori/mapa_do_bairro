@@ -38,7 +38,6 @@ function initMap() {
     center: {lat: -25.400118 , lng: -49.237518},
     zoom: 14
   });
-  console.log(map)
 
   // Cria uma infowindow para apresentar informações no marker,
   infowindow = new google.maps.InfoWindow({
@@ -74,6 +73,29 @@ function initMap() {
     this.textWiki = "";
   };
 
+  var viewList = ko.observableArray([]);
+  locations.forEach(function (item) {
+      viewList().push(new View(item));
+  });
+
+  // Adiciona o marker para cada local e adiciona conteúdo ao infowindow
+  // com o evento "click"
+  viewList().forEach(function (view) {
+      var marker = new google.maps.Marker({
+          map: map,
+          position: view.location,
+          animation: google.maps.Animation.DROP
+      });
+      view.marker = marker;
+      bounds.extend(marker.position);
+      marker.addListener("click", function (e) {
+          map.panTo(this.position);
+          infowindow.setContent(getContent(view));
+          infowindow.open(map, marker);
+          toggleBounce(marker);
+      });
+  });
+
   // Cria um efeito de BOUNCE quando clicar sobre o marker.
   function toggleBounce(marker) {
         if (marker.getAnimation() !== null) {
@@ -100,7 +122,7 @@ function initMap() {
               view.Url +
             " target=_blank>Acessar a Wikipédia</a>"+
         "</div>";
-        let errorString = "Conteúdo não disponível na Wikipédia.";
+        var errorString = "Conteúdo não disponível na Wikipédia.";
         if (view.name.length > 0) {
             return contentString;
         } else {
@@ -111,37 +133,14 @@ function initMap() {
   var ViewModel = function(){
     var self = this;
 
-    this.itemClicked = function (view) {
+    self.itemClicked = function (view) {
             google.maps.event.trigger(view.marker, "click");
         };
 
-    this.viewList = ko.observableArray([]);
-    locations.forEach(function (item) {
-        self.viewList().push(new View(item));
-    });
-    //
-87/5000
-    // Adiciona o marker para cada local e adiciona conteúdo ao infowindow
-    // com o evento "click"
-    self.viewList().forEach(function (view) {
-        var marker = new google.maps.Marker({
-            map: map,
-            position: view.location,
-            animation: google.maps.Animation.DROP
-        });
-        view.marker = marker;
-        bounds.extend(marker.position);
-        marker.addListener("click", function (e) {
-            map.panTo(this.position);
-            infowindow.setContent(getContent(view));
-            infowindow.open(map, marker);
-            toggleBounce(marker);
-        });
-    });
 
     // Requisição AJAX
-    this.getWikipediaInfos = ko.computed(function () {
-        self.viewList().forEach(function (view) {
+    self.getWikipediaInfos = ko.computed(function () {
+        viewList().forEach(function (view) {
             var  wikiURL = 'http://pt.wikipedia.org/w/api.php?action=opensearch&search=' + view.name() + '&format=json&callback=wikiCallback';
             $.ajax(wikiURL, {
               dataType: "jsonp",
@@ -152,20 +151,24 @@ function initMap() {
                 view.name = response[1][0];
                 view.textWiki = response[2][0];
                 view.Url = response[3][0];
+            }).fail(function(jqXHR, textStatus) {
+                infowindow.setContent('<div>' +
+                  '<h3>' + view.name + '</h3>' + '</div><br><p>Não foi possível conectar com a Wikipédia! </p><hr><div></div>');
+                infowindow.open(map, view.marker);
             });
         });
     });
 
     self.query = ko.observable('');
 
-    this.filteredViewList = ko.computed(function(){
+    self.filteredViewList = ko.computed(function(){
       if(!self.query()){
-        return ko.utils.arrayFilter(self.viewList(), function(item){
+        return ko.utils.arrayFilter(viewList(), function(item){
           item.marker.setVisible(true);
           return true;
         });
       }else{
-        return ko.utils.arrayFilter(this.viewList(), function(item){
+        return ko.utils.arrayFilter(self.viewList(), function(item){
           if (item.name.toLowerCase().indexOf(self.query()) >= 0){
             item.marker.setVisible(true);
             return true;
@@ -175,9 +178,9 @@ function initMap() {
           }
         });
       }
-    }, this);
+    }, self);
 
-  }
+  };
   ko.applyBindings(new ViewModel());
 }
 // Função para verificar o erro de carregamento do mapa
