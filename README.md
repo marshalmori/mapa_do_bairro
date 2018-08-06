@@ -1,36 +1,19 @@
 
-# Catálogo
-Esta aplicação feita em Python, utilizando o framework Flask, é um catálogo de produtos. A página inicial apresenta as categorias dos produtos, ao acessar uma categoria você é apresentado aos itens presentes nesse grupo e em cada item é mostrada uma imagem, preço e breve apresentação do produto utilizando texto.
+# Mapa do Bairro
+Aplicação feita em JavaScript, utilizando o framework knockout e API de mapas do Google. O promaga aprensentará uma sidebar com a lista dos locais, marcadores desses locais no mapa e em cada marcador teremos uma janela das informações do local. Além disso, um campo de pesquisa posicionado na navbar. Nesse campo de busca ao escrever o local ele vai retirando os locais não digitados da lista e o mesmo acontecerá com os marcadores no mapa.
 
 
 ## Instalação
-Abaixo temos os passos necessários para conseguir rodar a aplicação, lembrando
-que nesse projeto foi utilizado o Python 3.6 como versão:
-
-1. **Instalar os pacotes utilizados no projeto** - utilizando o `pip` instale os seguintes pacotes mostrados abaixo:
-    * `$ pip install Flask`
-    * `$ pip install sqlalchemy`
-    * `$ pip install passlib`
-    * `$ pip install flask-httpauth`
-    * `$ pip install httplib2`
-    * `$ pip install psycopg2`
-    * `$ pip install psycopg2-binary`
-    * `$ pip install requests`
-    * `$ pip install oauth2client`
-
-2. **Download do projeto** - basta fazer um clone, fork ou download desse projeto, direto para sua máquina.
-3. **Criar o banco de dados** - utilizando o comando `python database_setup.py` será criado o banco de dados chamado `catalogo.db`.
-4. **Levantando a aplicação** - execute o comando `python app.py` para rodar a aplicação.
-5. **Abrindo no navegador web** - escolha um navegador web e digite na http://localhost:5000 na barra de navegação e a aplicação será apresentada.
+A instalação dessa aplicação é bem simples:  basta clonar ou baixar este projeto.
 
 
 ## Como utilizar a aplicação
-Antes de utilizar a aplicação certifique-se de que executou os passos 4 e 5 do item anterior.
+Acesse a pasta do projeto e abra em um navegador web o arquivo `index.html`. O arquivo com o JavaScript do projeto fica na pasta `/static/js/map.js`
 
 ### Tela inicial
-Abaixo é apresentada a tela inicial. Na imagem abaixo vemos algumas categorias, no entanto não se preocupe caso não apareçam os campos com as categorias, isso está acontecendo porque nessa situação não foi cadastrada nenhuma categoria ainda.
+Abaixo é apresentada a tela principal(e única) do projeto.
 
-![Tela Inicial](static/images/readme/tela_inicial.png)
+![Tela Inicial](static/images/tela_princial.png)
 
 ### Fazer login
 Para fazer login basta clicar no canto superior direito, sobre a palavra Login e a tela abaixo será apresentada. Para logar-se basta clicar no botão azul escrito Fazer login. Ao clicar sobre o botão uma tela de autenticação do Google será aberta e apresentará pelo menos uma conta do Google (caso tenha cadastro no Google), escolha sua conta e você será redirecionado para a plataforma Catálogo.
