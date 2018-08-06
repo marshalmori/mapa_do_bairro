@@ -1,5 +1,6 @@
 
 # Mapa do Bairro
+O Mapa do Bairro é um projeto que apresenta alguns locais do bairro Bacacheri e seus vizinhos trazendo um marcador no mapa do Google e algumas informações sobre esses locais.
 Aplicação feita em JavaScript, utilizando o framework knockout e API de mapas do Google. O promaga aprensentará uma sidebar com a lista dos locais, marcadores desses locais no mapa e em cada marcador teremos uma janela das informações do local. Além disso, um campo de pesquisa posicionado na navbar. Nesse campo de busca ao escrever o local ele vai retirando os locais não digitados da lista e o mesmo acontecerá com os marcadores no mapa.
 
 
