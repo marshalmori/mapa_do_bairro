@@ -9,7 +9,7 @@ A instalação dessa aplicação é bem simples:  basta clonar ou baixar este pr
 
 
 ## Como utilizar a aplicação
-Acesse a pasta do projeto e abra em um navegador web o arquivo `index.html`. O arquivo com o JavaScript do projeto fica no seguinte caminho `/static/js/map.js`
+Acesse a pasta do projeto e abra em um navegador web o arquivo `index.html`. O arquivo com o JavaScript do projeto fica no seguinte caminho `mapa_do_bairro/static/js/map.js`
 
 ### Tela inicial
 Abaixo é apresentada a tela principal(e única) do projeto.
